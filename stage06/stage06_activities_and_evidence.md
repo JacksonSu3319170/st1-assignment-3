@@ -280,25 +280,25 @@ Every change should be linked to a clear requirement, developed in a focused bra
 
 ## M Completion and handover
 
-- Starting SHA: [response]
-- Final Stage 6 code SHA: [response]
-- Test command: [response]
-- Working directory: [response]
-- Observed result: [response]
-- PR and another-member reviewer: [links]
-- Unresolved issue or none: [response]
-- Stage 7 handover status: [ready for tutor checkpoint / unresolved work]
-- Final submitted SHA if later than tested SHA: [response and evidence-only difference]
+- Starting SHA: cb1a64ecd31300af393ca5a64d5bde4af025cf8e
+- Final Stage 6 code SHA: 94040455ee63f4cf766f456e7dc3fd80f67264d0
+- Test command: [python -m pytest]
+- Working directory: [project/]
+- Observed result: 36 tests collected and 36 passed in 0.03 seconds, using Python 3.14.7 and pytest 8.3.5 on macOS.
+- PR and another-member reviewer: [PR #1, #2, #3 all reviewed by Jackson]
+- Unresolved issue or none: None
+- Stage 7 handover status: Ready for checkpoint
 
-- [ ] Three Stage 6 service targets completed and checked.
-- [ ] Original supplied tests retained and passing.
-- [ ] At least two focused issues link requirements and acceptance criteria.
-- [ ] Feature work reviewed by another member using the actual diff.
-- [ ] Human-first review and required Copilot comparison recorded.
-- [ ] Feedback resolved and approval recorded before merge.
-- [ ] Everyone pulled main and integrated checks passed.
-- [ ] Required activities, quiz responses and contribution notes completed.
-- [ ] Only synthetic data included; confidential peer material kept out.
-- [ ] Tutor can trace a requirement through issue, code, tests, PR and checkpoint.
+
+- [x] Three Stage 6 service targets completed and checked.
+- [x] Original supplied tests retained and passing.
+- [x] At least two focused issues link requirements and acceptance criteria.
+- [x] Feature work reviewed by another member using the actual diff.
+- [x] Human-first review and required Copilot comparison recorded.
+- [x] Feedback resolved and approval recorded before merge.
+- [x] Everyone pulled main and integrated checks passed.
+- [x] Required activities, quiz responses and contribution notes completed.
+- [x] Only synthetic data included; confidential peer material kept out.
+- [x] Tutor can trace a requirement through issue, code, tests, PR and checkpoint.
 
 Do not write a file's own future commit SHA into that file. Record the tested code SHA first, then commit the evidence; explain the difference when submitting.
