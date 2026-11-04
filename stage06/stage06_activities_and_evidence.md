@@ -140,6 +140,53 @@ Repeat this block per PR. Record actual events, not planned approvals.
 - Each member updated main: Jonathan — confirmed; Jackson — confirmed; Ayaz — confirmed after pulling the merged changes and running tests.
 - Integrated verification after merge: Ran python -m pytest from project/. All 16 tests passed. Tested code SHA: [actual SHA from git rev-parse HEAD].
 
+Pull Request 2 — FR-06/FR-07 Appointment Cancellation
+PR link: https://github.com/JacksonSu3319170/st1-assignment-3/pull/5#issue-6202039518
+
+Linked issue: #2 — FR-06/FR-07 Appointment Cancellation and Retained History
+
+Branch: feature/appointment-cancellation
+
+Commit link/SHA: 2a7fb86b464beedc5706340e764d8020675e2c49
+
+Reviewer: Jackson/Ayaz
+
+Key feedback: The implementation correctly uses the existing Appointment.cancel() method to change an appointment from SCHEDULED to CANCELLED. It preserves the appointment in the data store and prevents invalid transitions, including repeated cancellation and cancellation of completed appointments. The tests cover the main requirements. A possible improvement is to add a test confirming that appointment details, such as the patient, practitioner and date/time, remain unchanged after cancellation.
+
+Author response/change and verification: The author, Jonathan, reviewed the suggested improvement and confirmed that cancellation only changes the appointment status. The existing automated tests passed with 18 successful tests. The additional appointment-details test should be added and verified if the reviewer requests it.
+
+Merge outcome and SHA: Merged 
+
+Significant Copilot assistance: GitHub Copilot review 
+
+Linked issue closure: Issue #2 remains open until the approved PR is merged.
+
+Each member updated main: Jonathan — confirmed; Jackson — confirmed; Ayaz — confirmed after pulling the merged changes and running tests.
+
+Local verification: python -m pytest from project/ — 18 passed. 
+
+### Pull Request 3 — FR-03 Practitioner Lookup
+
+- **PR link:** https://github.com/JacksonSu3319170/st1-assignment-3/pull/6#issue-6202135494
+- **Linked issue:** #3 — FR-03 Practitioner Lookup
+- **Branch:** `feature/practitioner-lookup`
+- **Commit link/SHA:** 3d87bbf4eeabb6ed325c7b4f3ba12ea980529e51
+- **Reviewer:** Jackson/Ayaz
+
+- **Key feedback:** The practitioner lookup implementation correctly delegates to the existing data store and returns the original stored practitioner object. It handles invalid and unknown IDs, whitespace trimming and case sensitivity. The automated tests cover the main acceptance criteria. A possible improvement is to add a test confirming that an unsuccessful lookup does not affect other registered practitioners, although the existing test already checks preservation of one registered practitioner.
+
+- **Author response/change and verification:** Implemented `PractitionerService.find_practitioner` using the shared SmartCare data store. Added automated tests for successful lookup, object identity, trimmed IDs, case sensitivity, invalid and unknown IDs, and unchanged stored data. The local test suite passed.
+
+- **Merge outcome and SHA:** Merged 
+
+- **Significant Copilot assistance:** GitHub Copilot review.
+
+- **Linked issue closure:** Completed
+
+- **Each member updated main:** Jonathan — confirmed; Jackson — confirmed; Ayaz — confirmed after pulling the merged changes and running tests.
+
+- **Local verification**: `python -m pytest` from `project/` — [Insert actual test result]. Record the integrated test result and code SHA after merging.
+
 ## H Copilot collaboration record
 
 Record meaningful required use, not every trivial completion. Repeat per significant interaction.
