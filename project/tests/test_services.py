@@ -48,3 +48,15 @@ def test_find_patient_invalid_id(invalid_id):
 
     with pytest.raises(ValueError):
         service.find_patient(invalid_id)
+
+
+def test_failed_patient_lookup_does_not_change_stored_data():
+    store = SmartCareDataStore()
+    service = PatientService(store)
+
+    original_patient = service.register_patient("P1", "Alex Smith")
+
+    with pytest.raises(LookupError):
+        service.find_patient("UNKNOWN")
+
+    assert service.find_patient("P1") is original_patient
