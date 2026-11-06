@@ -137,20 +137,20 @@ Member and saved sequence/time or commit showing this preceded consultation: Aya
 Use the full handout prompt separately for BOTH defects, after E. Keep each actual prompt or accessible reference; include observed behaviour, expected behaviour, reproduction, failing test, human hypothesis, relevant code, three ranked causes and discriminating checks, with the no-rewrite/no-invented-requirements constraints.
 
 ### F8-01 Copilot review
-Actual prompt / output reference and member: [complete]
-1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-Final human conclusion and comparison with initial hypothesis: [complete]
+Actual prompt / output reference and member: Ayaz used the exact handout prompt structure in GitHub Copilot Chat on github.com, after committing Section E. This was the first prompt in the chat: https://github.com/copilot/c/22622eeb-e466-4c90-a934-e9fb6c9a72b0
+1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: find_appointment skips cancelled appointments. I checked the code and ran a quick script. A1 was still in list_appointments() but find_appointment('A1') returned None, and the code has the condition status.value != "cancelled". Correct. Accept, because the code and the runtime result both back it up.
+2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: The code being run might be different from the code I inspected. Copilot said this because it looked at my old Assignment 2 repo instead of our group repo. The traceback points to this project's smartcare/services.py, and git diff --stat shows data_store.py is the file the prep changed. Wrong. Reject, because it was based on the wrong repository.
+3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: The appointment ID might not match exactly. The stored ID is exactly 'A1', and A1 can be found fine before it's cancelled. It only goes missing after cancelling. Wrong. Reject, because the problem depends on the status, not the ID.
+Final human conclusion and comparison with initial hypothesis: The root cause is the status filter in find_appointment, which hides cancelled appointments even though they're still stored. This matches my Section E hypothesis that find_appointment only returns non-cancelled appointments. It's different from my A.2 tutorial guess that the appointment was being deleted, since it's actually still there, just hidden.
 
 ### F8-02 Copilot review
-Actual prompt / output reference and member: [complete]
-1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: [complete]
-Final human conclusion and comparison with initial hypothesis: [complete]
+Actual prompt / output reference and member: Ayaz used the exact handout prompt structure in GitHub Copilot Chat on github.com, after committing Section E. This was the second prompt in the same chat: https://github.com/copilot/c/22622eeb-e466-4c90-a934-e9fb6c9a72b0
+1. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: The practitioner check uses != instead of ==. The code has appointment.practitioner.practitioner_id != practitioner_id, and my script showed has_practitioner_conflict returned False for D1 (should be True) and True for D2 (should be False). I also checked that book_appointment in services.py raises ValueError when the check returns True, so the caller is fine. Correct. Accept.
+2. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: The two checks might have used different data or exclusions. Both checks ran straight after each other on the same store, with only A1 booked and no excluded ID. Wrong. Reject.
+3. Ranked suggestion / evidence check / observed evidence / correct, partly correct or wrong / accept, modify or reject with reason: The IDs or status values might not match. The IDs are exact strings and A1's status value really is 'scheduled'. Wrong as a cause, so reject. While checking this, I noticed that "scheduled" is hardcoded as a string instead of using AppointmentStatus.SCHEDULED, which I've noted as a possible refactor.
+Final human conclusion and comparison with initial hypothesis: The root cause is the inverted != comparison in has_practitioner_conflict. It flags a different practitioner as a clash and misses the same practitioner. This matches my Section E hypothesis that it was comparing the wrong thing. The evidence also showed a second effect I hadn't spotted: a different practitioner at the same time gets wrongly blocked, which breaks AC-04.2 and isn't caught by any current test.
 
-## G. Failing to passing regression evidence
+## G. Failing to passing regression evidence 
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
