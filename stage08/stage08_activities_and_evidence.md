@@ -181,9 +181,9 @@ Smell and exact location: Magic status string in has_practitioner_conflict in pr
 Small proposed structural change / why justified: Change it to appointment.status == AppointmentStatus.SCHEDULED. It's safer because a typo in a string wouldn't be caught, but a typo in the enum name would throw an error straight away. It also matches how the rest of the project uses statuses. It's one line and doesn't add anything new.
 External behaviour to preserve / relevant tests: The conflict rule has to stay exactly the same. Same practitioner, same exact time, existing SCHEDULED appointment means a conflict, while a different practitioner or a cancelled appointment doesn't count. Relevant tests are test_conflict_rule_and_different_practitioner, test_different_practitioner_same_time_is_allowed, and the cancelled-slot tests, plus the full suite.
 Before result: see G, full passing suite.
-Actual change / diff / separate refactor SHA: [complete]
-Focused and full after-refactor commands / working directory / results / evidence: [complete]
-Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: [complete]
+Actual change / diff / separate refactor SHA: 8e9298d. In has_practitioner_conflict, I changed appointment.status.value == "scheduled" to appointment.status == AppointmentStatus.SCHEDULED. That's the only line that changed.
+Focused and full after-refactor commands / working directory / results / evidence: From project/, python -m pytest -q tests/test_starter.py::test_conflict_rule_and_different_practitioner tests/test_stage8_regressions.py::test_different_practitioner_same_time_is_allowed gave 2 passed, and python -m pytest -q gave 46 passed in 0.16s. My first two attempts at the change had typos (SCHEDULED without AppointmentStatus, then a wrong attribute), and both times the full suite failed straight away with 1 failed, 45 passed. I fixed the line and reran before committing.
+Result — accepted, revised or rejected / reason / behaviour-preservation conclusion: Accepted after revising. The final change gives the exact same results as before, with the same 46 tests passing as before the refactor. So the conflict rule works exactly the same, it's just clearer and safer now.
 
 ## I. Git, human review and integration
 
@@ -198,9 +198,11 @@ Each member's substantive contribution and artefact: [complete]
 
 ## J. Required reflections
 
-1. Which Copilot diagnosis appeared convincing but lacked evidence? [complete; report honestly if none and discuss the least-supported real suggestion]
-2. What evidence changed your group's view? [complete]
-3. How did regression tests protect the refactoring? [complete]
+1. Which Copilot diagnosis appeared convincing but lacked evidence? Copilot's second suggestion for F8-01, that the code being run might be different from the code I looked at. It sounded smart and careful, but it only said that because it looked at my old Assignment 2 repo instead of our group repo. Once I checked the traceback and git diff, it was clear the code being run was exactly what I was looking at. It did the same thing again for F8-02, which showed me it can sound confident while looking at the completely wrong thing.
+
+2. What evidence changed your group's view? My first guess in A.2 was that the cancelled appointment was being deleted. The check script changed that, because it showed A1 was still in list_appointments() but find_appointment('A1') returned None, so it was being hidden, not deleted. For F8-02, the script showed the conflict check returned True for a different practitioner, which revealed a second problem (AC-04.2 being broken) that none of the existing tests had caught.
+
+3. How did regression tests protect the refactoring? They actually caught me. My first two tries at the refactor had small typos, and both times the full suite failed straight away with 1 failed, 45 passed, pointing right at the line I'd changed. Without the tests, I might have committed broken code thinking it was just a harmless clean-up. I only committed once all 46 passed again.
 
 ## K. Ten formative questions
 
