@@ -2,8 +2,8 @@
 
 Common UG and PG record. All Assignment 3 stage materials are provided from the beginning. Complete this stage only after the previous applicable stage has been integrated, verified and recorded. Use this supplied record in stage09/ in your EXISTING repository. Preserve project/, all earlier tests, records and responses. Do not download another starter or copy staff solutions. Use the Stage 9 handout and Overview/revision 2 baseline. Keep responses concise and link accessible artefacts; do not paste entire logs or private peer ratings.
 
-Group: <!-- complete -->
-Members and responsibilities: <!-- complete -->
+Group: Wed 4:30 - 6:30 Group 5
+Members and responsibilities: Jonathan (jonathansv7), Jackson (JacksonSu3319170), Ayaz (AyazMohammed999), all UG. Ayaz owns Stage 9.
 Stage 8 integrated SHA, command, working directory and actual result: <!-- complete -->
 
 ## A. Tutorial activities
@@ -12,46 +12,44 @@ Stage 8 integrated SHA, command, working directory and actual result: <!-- compl
 
 | Information | Required session/domain or transient state? | Requirement or reason |
 |---|---|---|
-| Patient identity | | |
-| Appointment history | | |
-| Temporary menu choice | | |
-| Practitioner specialty | | |
-| Debug print output | | |
-| Appointment status | | |
+| Patient identity | Required session/domain state | We need it to register patients and find them later (FR-01/FR-02) |
+| Appointment history | Required session/domain state | Cancelled ones still have to stick around (FR-07) |
+| Temporary menu choice | Transient | It's just what the user picked, we don't need it after that |
+| Practitioner specialty | Required session/domain state | It's part of the practitioner's details (FR-03) |
+| Debug print output | Transient | It's only for us to see what's going on, it's not data |
+| Appointment status | Required session/domain state | We need to know if it's scheduled, cancelled or done (FR-06/FR-07) |
 
-What is intentionally lost on exit? <!-- response -->
+What is intentionally lost on exit? Basically everything. It's all just kept in memory, so when you close the program it's all wiped. That's fine though, because we're not meant to save anything between runs.
 
 ### A2 Interface and domain data plan
 
-Plan before AI. This replaces schema/key design; no database tables are required.
-
 | Function or component | Explicit inputs and types | Outputs | Responsibility and validation | Domain source / existing constraint |
 |---|---|---|---|---|
-| appointment_sort_key | | | | |
-| select_appointments | | | | |
-| Service listing | | | | |
-| Console | | | | |
+| appointment_sort_key | appointment: Appointment | tuple[datetime, str] (date, then ID) | Just gives back what to sort by. That's it | date_time and appointment_id on the Appointment |
+| select_appointments | appointments: list[Appointment], practitioner_id: str, status: AppointmentStatus or None | New sorted list[Appointment] | Grabs one practitioner's appointments, and only one status if you ask for it. It doesn't check if the practitioner is real and it doesn't mess with the original list | The practitioner's ID and AppointmentStatus |
+| Service listing | practitioner_id: str, status: AppointmentStatus or None | New list[Appointment] | Checks the practitioner exists first (ValueError if blank, LookupError if unknown) and that the status is valid (ValueError if not). Then gets the list from the store and runs select_appointments on it | SmartCareDataStore.find_practitioner |
+| Console | Whatever the user types in | Stuff printed on screen | Reads input, turns it into the right type, calls the service and shows a proper message if something goes wrong. Then back to the menu | Just calls the services |
 
-Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actual participants/date_time/status to the existing contracts: <!-- response -->
+Relate patient ID/name, practitioner ID/name/specialty, and appointment ID/actual participants/date_time/status to the existing contracts: Patients have an ID and a name, and practitioners have an ID, name and specialty. None of them can be blank. Appointments have an ID, the real Patient and Practitioner objects, a date_time and a status. The query just reads those fields and gives back the same appointments. I'm not adding any new fields.
 
 ### A3 Responsibility violations
 
 | Conceptual case | Violation | Correct boundary and reason |
 |---|---|---|
-| Appointment.cancel reads input | | |
-| Service prints/reads the menu | | |
-| Query sorts its source in place | | |
-| Store prints Appointment saved | | |
+| Appointment.cancel reads input | An appointment shouldn't be asking the user anything | Let the console ask, then the service calls cancel() |
+| Service prints/reads the menu | That's the console's job, not the service's | The console does the menu. The service just does the work |
+| Query sorts its source in place | .sort() changes the list you passed in | Use sorted() so you get a new list and the old one stays the same |
+| Store prints Appointment saved | The store shouldn't print stuff | It should just save and return it, and let the console print. It's easier to test like that too |
 
 ### A4 Sorting comparison
 
-For `appointments.sort(key=appointment_sort_key)` and `result = sorted(appointments, key=appointment_sort_key)`, predict source order, return value and result identity. Give a meaningful mutation check: <!-- response -->
+For `appointments.sort(key=appointment_sort_key)` and `result = sorted(appointments, key=appointment_sort_key)`, predict source order, return value and result identity. Give a meaningful mutation check: .sort() reorders the actual list and returns None. sorted() doesn't touch the original and gives you a new list, so result is not appointments, but they've got the same objects in them. To check nothing got changed, I'd save the order of IDs before running it, then check it's still the same after, and that result is not appointments. Checking the length is pointless, because sorting in place doesn't change the length.
 
-Score-example prediction and explanation of passing the named key: <!-- response -->
+Score-example prediction and explanation of passing the named key: I reckon ordered comes out as [('Chen', 5), ('Ali', 8), ('Bea', 8)]. Chen's lowest so he's first, and Ali and Bea are tied on 8, so it goes by name. scores stays the same, and ordered is a new list. You write key=score_key (no brackets) so sorted() can use the function on each item. If you put brackets, it runs it straight away and breaks.
 
 ### A5 Exit question
 
-Explain cancellation versus deletion, and checks for same-session lookup, all-status listing and SCHEDULED-only exclusion: <!-- response -->
+Explain cancellation versus deletion, and checks for same-session lookup, all-status listing and SCHEDULED-only exclusion: Cancelling just marks it as CANCELLED, it doesn't delete it, because FR-07 says we've got to keep the history. To prove it, I'd book A1, cancel it, then look it up again and make sure it's the same one with status CANCELLED. Then I'd list all the practitioner's appointments and A1 should still be there. But if I only list SCHEDULED ones, A1 shouldn't show up, since it's not scheduled anymore.
 
 ## B. Human design and contracts
 
