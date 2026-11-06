@@ -85,23 +85,23 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## B. Stage 7 baseline and safe preparation
 
-- Stage 7 code SHA and requirement baseline: [complete]
-- Baseline test command / working directory / observed result / evidence: [complete]
-- Clean preparation SHA if a record-only commit followed Stage 7: [complete]
-- Branch and preparer / how teammates obtained this branch: [complete]
-- Downloaded tool version, source SHA256 and --check outcome: [complete]
-- --apply and --verify output summaries / artefact references: [complete]
-- Bounded diff inspected and recovery location (not committed): [complete]
-- Prepared faulty-state commit SHA: [complete]
-- Preparation or recovery issues and resolution, if any: [complete]
-- Initial prepared full-suite command / result / key failures: [complete]
+- Stage 7 code SHA and requirement baseline: 22d9bfb7df2a385abfd74bbf7ca1595384ca6a3f. This is main after the Stage 7 tests PR was merged, and it's our passing baseline for FR-01 to FR-07.
+- Baseline test command / working directory / observed result / evidence: I ran python -m pytest -q from project/ on main and got 44 passed in 0.17s.
+- Clean preparation SHA if a record-only commit followed Stage 7: Not applicable. The preparation started straight from the Stage 7 main SHA above.
+- Branch and preparer / how teammates obtained this branch: The branch is debug/stage08 and it was prepared by our tutor, Pranav. Each of us got it by running git fetch origin and then git switch --track origin/debug/stage08.
+- Downloaded tool version, source SHA256 and --check outcome: We didn't get the tool ourselves because it's staff-controlled. Pranav ran preparation utility version 1.1 himself, so we don't have the SHA256 or the --check output.
+- --apply and --verify output summaries / artefact references: Pranav ran these. In his email he confirmed the verification passed and both expected debugging symptoms were added correctly.
+- Bounded diff inspected and recovery location (not committed): git diff --stat 22d9bfb 029e78b shows only one file was changed, project/smartcare/data_store.py (11 insertions, 18 deletions). Nothing else was touched. The recovery files are kept by teaching staff and were never in our repo.
+- Prepared faulty-state commit SHA: 029e78b3314f41b336b0778a1ee6f17782ad8acb
+- Preparation or recovery issues and resolution, if any: None of us could make the in-person session, so Pranav did the preparation remotely. Jackson added him as a temporary collaborator, he pushed debug/stage08, and his access was removed afterwards. main stayed the same.
+- Initial prepared full-suite command / result / key failures: I ran python -m pytest -q from project/ on debug/stage08 and got 3 failed, 41 passed in 0.40s. The failures were test_cancelled_appointment_remains_stored and test_cannot_cancel_twice (both LookupError: Appointment not found), and test_conflict_rule_and_different_practitioner (DID NOT RAISE ValueError).
 
 ## C. F8-01 diagnosis and repair
 
-- Symptom / observed behaviour: [complete]
-- Expected behaviour and requirement: [complete]
-- Minimal synthetic reproduction steps: [complete]
-- Meaningful failing test path/name and exact relevant failure: [complete]
+- Symptom / observed behaviour: After an appointment gets cancelled, trying to look it up again gives LookupError: Appointment not found. So the cancelled appointment basically disappears.
+- Expected behaviour and requirement: The appointment should still be stored and found with the status CANCELLED. FR-06 (AC-05.1) says cancelling changes the status to CANCELLED, and FR-07 (AC-05.2) says cancelled appointments have to stay in the history.
+- Minimal synthetic reproduction steps: Register patient P1 and practitioner D1, book appointment A1, cancel A1, then try to find or cancel A1 again. It raises LookupError instead of finding it.
+- Meaningful failing test path/name and exact relevant failure: tests/test_appointment_cancellation.py::test_cancelled_appointment_remains_stored and tests/test_appointment_cancellation.py::test_cannot_cancel_twice. Both fail with LookupError: Appointment not found, raised at smartcare/services.py line 140.
 - Human hypothesis and intended checks: see E, F8-01.
 - Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
 - Smallest justified fix / diff / why other behaviour is preserved: [complete]
@@ -109,10 +109,10 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 
 ## D. F8-02 diagnosis and repair
 
-- Symptom / observed behaviour: [complete]
-- Expected behaviour and requirement: [complete]
-- Minimal synthetic reproduction steps: [complete]
-- Meaningful failing test path/name and exact relevant failure: [complete]
+- Symptom / observed behaviour: Booking the same practitioner at the exact same time goes through when it should be blocked.
+- Expected behaviour and requirement: FR-05 (AC-04.1) says booking the same practitioner, at the exact same time, while there's already a SCHEDULED appointment, should raise ValueError. AC-04.2 says a different practitioner at the same time is still allowed.
+- Minimal synthetic reproduction steps: Register patient P1 and practitioners D1 and D2, book A1 for P1 with D1 at 2026-10-01 09:00, then try to book another appointment with D1 at the same time. No error is raised.
+- Meaningful failing test path/name and exact relevant failure: tests/test_starter.py::test_conflict_rule_and_different_practitioner fails at line 127 with Failed: DID NOT RAISE <class 'ValueError'>.
 - Human hypothesis and intended checks: see E, F8-02.
 - Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
 - Smallest justified fix / diff / why other behaviour is preserved: [complete]
@@ -123,14 +123,14 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 Complete both entries BEFORE Copilot. C/D supply observed/expected/reproduction/test; retain those initial facts and link them here.
 
 ### F8-01 human entry
-Likely cause and why plausible: [complete]
-Evidence intended to inspect / competing explanation / discriminating check: [complete]
-Member and saved sequence/time or commit showing this preceded consultation: [complete]
+Likely cause and why plausible: I think something in data_store.py is losing or hiding the appointment after it's cancelled. Maybe find_appointment only returns appointments that are still SCHEDULED, or the cancelled appointment isn't saved back properly. This makes sense because the prep only changed data_store.py, and the error happens straight after cancelling.
+Evidence intended to inspect / competing explanation / discriminating check: I'll check find_appointment and how appointments are saved in data_store.py. Another possibility is that cancel_appointment in services.py is removing it, but that file wasn't changed by the prep. To tell them apart, I'll book and cancel A1, then check if A1 is still in the store's appointments collection. If it's still there, the lookup is the problem. If it's gone, the saving or removal is the problem.
+Member and saved sequence/time or commit showing this preceded consultation: Ayaz, recorded and committed before using Copilot (see commit "Record Stage 8 baseline, symptoms and human hypotheses")
 
 ### F8-02 human entry
-Likely cause and why plausible: [complete]
-Evidence intended to inspect / competing explanation / discriminating check: [complete]
-Member and saved sequence/time or commit showing this preceded consultation: [complete]
+Likely cause and why plausible: I think has_practitioner_conflict in data_store.py isn't detecting the clash properly. It might be comparing the wrong thing, like the patient instead of the practitioner, or checking for the wrong status. This fits because the booking just goes through with no error, and the prep only changed data_store.py.
+Evidence intended to inspect / competing explanation / discriminating check: I'll look at has_practitioner_conflict in data_store.py. Another possibility is that book_appointment in services.py isn't calling the check at all, but services.py wasn't changed. To tell them apart, I'll book A1 with D1 at 09:00 and then call has_practitioner_conflict directly for D1 at the same time. If it returns False, the check itself is broken.
+Member and saved sequence/time or commit showing this preceded consultation: Ayaz, recorded and committed before using Copilot (see commit "Record Stage 8 baseline, symptoms and human hypotheses")
 
 ## F. GitHub Copilot prompts, findings and human decisions
 
