@@ -69,7 +69,18 @@ Response and reason:
 ### A.5 Traceback and hypothesis ranking
 Using one actual failure, identify its exception/assertion, expected and observed values, test line, application call path and supporting requirement. List three plausible causes and rank them by fit with the available evidence. For each cause, name a check that could distinguish it from the others. Explain why a traceback alone does not establish the cause.
 
-Response and reason: [complete] 
+Response and reason:
+
+- Failure I used: tests/test_appointment_cancellation.py::test_cancelled_appointment_remains_stored
+- What failed: It threw LookupError: Appointment not found. The line that failed was line 45 in the test, assert service.find_appointment("A1") is appointment.
+- Expected vs what actually happened: I expected to get the same A1 appointment back with its status as CANCELLED. Instead I just got a LookupError and nothing came back.
+- How the error got there: The test asks AppointmentService to find A1, and the service then asks the data store for it. The data store gives back None, so the service throws the LookupError at line 140 in services.py.
+- Requirement it breaks: FR-07 (AC-05.2) says cancelled appointments have to stay in the history, and FR-06 (AC-05.1) says cancelling should change the status to CANCELLED.
+- My three guesses, from most to least likely:
+  1. The data store's find_appointment is skipping cancelled appointments. To check, I'd cancel A1 and then compare list_appointments() with find_appointment('A1'). If A1 shows up in the list but can't be found, the lookup is the problem.
+  2. Cancelling is removing or replacing A1 in the store. To check, I'd see if A1 is still in list_appointments() after cancelling, and whether it's the same object as before.
+  3. The ID isn't matching because of spaces or capital letters. To check, I'd try finding A1 before cancelling it. If that works, the ID is fine.
+- Why the traceback isn't enough on its own: The traceback points to line 140 in services.py, but that line only throws the error because the data store handed back None. So it tells you where the error showed up, not why the data store couldn't find A1. You still have to look at data_store.py and actually test it to find the real cause.
 
 ### A.6 Exit question
 Why is changing code immediately after seeing a failure often a poor debugging strategy?
@@ -81,7 +92,7 @@ Changing the code as soon as you see a failure is kind of like guessing. You mig
 
 Classification responses (1–5, each with reason): See A.1 above.
 Tutorial debugging record — expected; observed; reproduction; hypothesis; evidence to inspect: See A.2 above.
-Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: [complete]
+Traceback — exception/assertion; expected/observed values; test line; call path; requirement; ranked causes and discriminating checks: See A.5 above.
 
 ## B. Stage 7 baseline and safe preparation
 
@@ -103,9 +114,9 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Minimal synthetic reproduction steps: Register patient P1 and practitioner D1, book appointment A1, cancel A1, then try to find or cancel A1 again. It raises LookupError instead of finding it.
 - Meaningful failing test path/name and exact relevant failure: tests/test_appointment_cancellation.py::test_cancelled_appointment_remains_stored and tests/test_appointment_cancellation.py::test_cannot_cancel_twice. Both fail with LookupError: Appointment not found, raised at smartcare/services.py line 140.
 - Human hypothesis and intended checks: see E, F8-01.
-- Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
-- Smallest justified fix / diff / why other behaviour is preserved: [complete]
-- Repair SHA / focused verification result: [complete]
+- Supported root cause and inspected code/runtime evidence: find_appointment in data_store.py had an extra condition, appointment.status.value != "cancelled", so it skipped over any cancelled appointment. My check script showed A1 was still in list_appointments() after cancelling, but find_appointment('A1') returned None. So it was hidden, not deleted. Copilot's top suggestion agreed once I checked it against this.
+- Smallest justified fix / diff / why other behaviour is preserved: I removed just that one status condition, so find_appointment matches on the ID only. It still rejects blank IDs with ValueError, still returns the same stored object, and still returns None for unknown IDs (so the service still raises LookupError). Nothing else in the file was changed.
+- Repair SHA / focused verification result: f2e6e19. python -m pytest -q tests/test_appointment_cancellation.py tests/test_stage8_regressions.py::test_data_store_still_finds_cancelled_appointment from project/ gave 11 passed.
 
 ## D. F8-02 diagnosis and repair
 
@@ -114,9 +125,9 @@ Traceback — exception/assertion; expected/observed values; test line; call pat
 - Minimal synthetic reproduction steps: Register patient P1 and practitioners D1 and D2, book A1 for P1 with D1 at 2026-10-01 09:00, then try to book another appointment with D1 at the same time. No error is raised.
 - Meaningful failing test path/name and exact relevant failure: tests/test_starter.py::test_conflict_rule_and_different_practitioner fails at line 127 with Failed: DID NOT RAISE <class 'ValueError'>.
 - Human hypothesis and intended checks: see E, F8-02.
-- Supported root cause and inspected code/runtime evidence: [complete after diagnosis]
-- Smallest justified fix / diff / why other behaviour is preserved: [complete]
-- Repair SHA / focused verification result: [complete]
+- Supported root cause and inspected code/runtime evidence: has_practitioner_conflict in data_store.py used != instead of == when comparing the practitioner ID, so it looked for clashes with every other practitioner instead of the same one. My check script showed it returned False for D1 (should be True) and True for D2 (should be False).
+- Smallest justified fix / diff / why other behaviour is preserved: I changed that one != to ==. Everything else in the check stayed the same. It still needs the exact same time, still only counts SCHEDULED appointments (so cancelled ones free up the slot), and still respects the excluded appointment ID.
+- Repair SHA / focused verification result: 946dfe1. python -m pytest -q tests/test_starter.py::test_conflict_rule_and_different_practitioner tests/test_stage8_regressions.py::test_different_practitioner_same_time_is_allowed from project/ gave 2 passed.
 
 ## E. Human-first hypotheses
 
@@ -154,20 +165,21 @@ Final human conclusion and comparison with initial hypothesis: The root cause is
 
 | Checkpoint | Code SHA or precise diff | Command and working directory | Actual result and artefact reference |
 |---|---|---|---|
-| F8-01 before repair | [complete] | [complete] | [complete] |
-| F8-01 after repair | [complete] | [complete] | [complete] |
-| F8-02 before repair | [complete] | [complete] | [complete] |
-| F8-02 after repair | [complete] | [complete] | [complete] |
-| Full suite after both repairs, before refactor | [complete] | [complete] | [complete] |
+| F8-01 before repair | bc543d3 (regression tests added, no fixes yet) | python -m pytest -q from project/ | 5 failed, 41 passed. F8-01 failures: test_cancelled_appointment_remains_stored and test_cannot_cancel_twice (LookupError), and test_data_store_still_finds_cancelled_appointment (assert None is appointment) |
+| F8-01 after repair | f2e6e19 | python -m pytest -q tests/test_appointment_cancellation.py tests/test_stage8_regressions.py::test_data_store_still_finds_cancelled_appointment from project/ | 11 passed |
+| F8-02 before repair | bc543d3 (the conflict check code didn't change until 946dfe1) | python -m pytest -q from project/ | F8-02 failures: test_conflict_rule_and_different_practitioner (DID NOT RAISE ValueError) and test_different_practitioner_same_time_is_allowed (ValueError: Practitioner already has a SCHEDULED appointment) |
+| F8-02 after repair | 946dfe1 | python -m pytest -q tests/test_starter.py::test_conflict_rule_and_different_practitioner tests/test_stage8_regressions.py::test_different_practitioner_same_time_is_allowed from project/ | 2 passed |
+| Full suite after both repairs, before refactor | 946dfe1 | python -m pytest -q from project/ | 46 passed in 0.16s |
 
-Explain how the assertions detect each relevant incorrect result and protect previous behaviour: [complete]
-Unrelated failures investigated / resolution: [complete or not applicable with reason]
+Explain how the assertions detect each relevant incorrect result and protect previous behaviour: For F8-01, test_data_store_still_finds_cancelled_appointment checks that the store returns the exact same appointment object (using is) and that its status is CANCELLED. So if the appointment gets hidden, replaced or not cancelled properly, the test fails. For F8-02, test_different_practitioner_same_time_is_allowed checks that a second practitioner at the same time actually gets booked and stays SCHEDULED, which catches the wrong blocking that no test picked up before. The existing starter test still checks that the same practitioner at the same time raises ValueError. All 44 original tests still pass, so the fixes didn't break anything that already worked.
+Unrelated failures investigated / resolution: Not applicable. The only failures were the 3 caused by the prepared defects and my 2 new regression tests, and all 46 tests pass after both fixes.
+
 
 ## H. Refactoring decision and before/after verification
 
-Smell and exact location: [complete]
-Small proposed structural change / why justified: [complete before editing]
-External behaviour to preserve / relevant tests: [complete]
+Smell and exact location: Magic status string in has_practitioner_conflict in project/smartcare/data_store.py. It checks appointment.status.value == "scheduled" using a hardcoded string instead of the AppointmentStatus enum that's already imported at the top of the file.
+Small proposed structural change / why justified: Change it to appointment.status == AppointmentStatus.SCHEDULED. It's safer because a typo in a string wouldn't be caught, but a typo in the enum name would throw an error straight away. It also matches how the rest of the project uses statuses. It's one line and doesn't add anything new.
+External behaviour to preserve / relevant tests: The conflict rule has to stay exactly the same. Same practitioner, same exact time, existing SCHEDULED appointment means a conflict, while a different practitioner or a cancelled appointment doesn't count. Relevant tests are test_conflict_rule_and_different_practitioner, test_different_practitioner_same_time_is_allowed, and the cancelled-slot tests, plus the full suite.
 Before result: see G, full passing suite.
 Actual change / diff / separate refactor SHA: [complete]
 Focused and full after-refactor commands / working directory / results / evidence: [complete]
