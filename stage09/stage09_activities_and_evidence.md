@@ -53,13 +53,22 @@ Explain cancellation versus deletion, and checks for same-session lookup, all-st
 
 ## B. Human design and contracts
 
-Complete before GitHub Copilot. Record any interface/integrity decision and its reasoning: <!-- response -->
+Complete before GitHub Copilot. Record any interface/integrity decision and its reasoning: The console is the only part that turns text the user types into proper types. For example, it changes "cancelled" into AppointmentStatus.CANCELLED and a date string into a datetime. The service only accepts a real AppointmentStatus or None, and anything else, like the plain string "scheduled", gets a ValueError instead of quietly returning nothing. The service also checks the practitioner first and then passes the registered practitioner's ID to the query, so typing " D1 " with spaces still works. The query itself just filters and sorts, and gives back a new list holding the same appointment objects.
 
 | Requirement | Input / session data | Operation and responsible component | Expected result or error | Test / evidence |
 |---|---|---|---|---|
-| | | | | |
+| QRY-01 | Appointments for D1 and D2 | select_appointments in queries.py | Only D1's appointments come back, and D2's are left out | Practitioner isolation test with D2 as the control |
+| QRY-02 | Appointments that are SCHEDULED, CANCELLED and COMPLETED | select_appointments with no status, then each status | No status gives all of them. Each status gives only that kind. A status with no matches gives an empty list | Status filter tests |
+| QRY-03 | Appointments at different times, plus two at the same time with different IDs | select_appointments using appointment_sort_key | Sorted by date and time, and same-time ones sorted by ID. The original list order and fields don't change | Ordering and tie-break test |
+| QRY-04 | A known practitioner with no matches, an unknown ID, a blank ID, and the string 'scheduled' as a status | AppointmentService.list_practitioner_appointments in services.py | Known with no matches gives an empty list, unknown gives LookupError, blank gives ValueError, and a non-enum status gives ValueError | Service listing tests |
+| FP-01 | The same inputs run twice | select_appointments | Same result both times. No globals, no printing, no input | Repeated-call test and reading the code |
+| FP-02 | An empty list, an already sorted list and an unsorted list | select_appointments | Always a brand new list (result is not the source), and the objects inside don't change | New-list tests |
+| FP-03 | A single appointment | appointment_sort_key | Returns (date_time, appointment_id), and sorting actually uses it | Direct key test |
+| FR-07 | A1 booked and then cancelled | Service listing | A1 still shows up with no status filter, but not when filtering by SCHEDULED | Retained history workflow test |
+| UI-01 | Menu inputs for a full run through | run_menu in console.py, started with main.py --interactive | Register, find, book, conflict, cancel, list and exit all work in one session | Console demo |
+| UI-02 | Bad inputs like an unknown menu choice, blank or unknown IDs, a bad date or a bad status | Console | Shows an error message, nothing in the data changes, and you can keep using the menu | Console demo |
 
-Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty versus unknown versus invalid, enum conversion, actual object identity, error handling and unchanged state on rejection: <!-- response -->
+Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty versus unknown versus invalid, enum conversion, actual object identity, error handling and unchanged state on rejection: Empty means the practitioner is real but has no matching appointments, so you just get an empty list and that's fine. Unknown means the ID looks okay but nobody's registered with it, so that's a LookupError. Invalid means the ID is blank or the status isn't a real AppointmentStatus, so that's a ValueError. Only the console turns typed words into the enum, so the service never has to guess what a string means. The lists that come back are new, but they hold the actual stored appointment objects, so checks like "is" still work. When something gets rejected, the service raises the error before changing anything, and the console catches it, shows a message and goes back to the menu, so the stored data stays exactly the same.
 
 ## C. Implementation and query verification
 
