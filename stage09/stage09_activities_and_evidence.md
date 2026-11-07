@@ -80,8 +80,8 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 | QRY-03 / test_equal_time_ties_break_by_id | queries.py appointment_sort_key | A1 and A2 are both at 2026-10-01 09:00, and A1 comes first because of its ID | Passed | Same file |
 | FP-03 / test_sort_key_returns_date_time_then_id | queries.py appointment_sort_key | The key for A1 is exactly (2026-10-01 09:00, 'A1') | Passed | Same file |
 | FP-03 / test_named_key_reuse_matches_query_order | queries.py appointment_sort_key | sorted() with the same named key gives the same order as the query | Passed | Same file |
-| FP-02 / test_source_order_and_fields_unchanged | queries.py select_appointments | The source IDs, dates and statuses are the same before and after, and result is not source | Passed | Same file |
-| FP-01 / test_repeated_calls_give_same_result_in_new_lists | queries.py select_appointments | Two calls with the same input give equal results, but in different list objects | Passed | Same file |
+| FP-02 / test_source_order_and_fields_unchanged | queries.py select_appointments | The source IDs, patients, practitioners, dates and statuses are the same before and after (patient and practitioner added in 2a443f5 after Copilot's finding), and result is not source  | Passed | Same file |
+|FP-01 / test_repeated_calls_give_same_result_in_new_lists | queries.py select_appointments | Two calls with the same input give equal results, but in different list objects | Passed | Same file |
 | FP-02 / test_empty_source_returns_new_empty_list | queries.py select_appointments | An empty list in gives a new empty list out | Passed | Same file |
 | FP-02 / test_already_sorted_source_returns_new_list | queries.py select_appointments | An already sorted list gives an equal list back, but not the same list object | Passed | Same file |
 | FP-02 / test_result_holds_actual_stored_objects | queries.py select_appointments | result[0] is a1 and result[2] is a3, so the new list holds the real objects | Passed | Same file |
@@ -129,22 +129,53 @@ Responsibility check: Each part still does its own job. The domain objects handl
 
 ## F. Required reflections
 
-1. Which integration concern was architectural rather than a filtering/sorting detail? <!-- response -->
-2. Which Copilot suggestion did you reject as over-engineering, and why? <!-- response -->
-3. How did you prove cancelled appointments remain retrievable and listable in the same session? <!-- response -->
+1. Which integration concern was architectural rather than a filtering/sorting detail? Honestly the filtering and sorting was the easy bit. The harder part was working out where everything should actually go. Like, who checks the practitioner exists? Who turns "cancelled" that the user types into AppointmentStatus.CANCELLED? Who prints the error? We ended up with the console doing all the text stuff and printing, the service checking the practitioner and the status, and the query just filtering and sorting. If we'd shoved the practitioner check or the string conversion into the query, it wouldn't be pure anymore and testing it would've been a pain.
+
+2. Which Copilot suggestion did you reject as over-engineering, and why? Copilot didn't really go overboard this time, it actually said there were no clear bugs. The closest one was when it wanted a scripted test that goes through every single menu option. I didn't do that, because I'd already planned in B to use real console runs as the UI evidence, and writing a test like that felt like way more than Stage 9 needs. I didn't fully reject it though. It had a fair point that 68 tests passing doesn't prove the console works, so I marked it as modify and kept the demos as my evidence.
+
+3. How did you prove cancelled appointments remain retrievable and listable in the same session? Two ways. First the tests: test_cancelled_history_retained_and_listed books A1, cancels it, then checks I get the exact same object back with status CANCELLED. It also checks A1 shows up when I list everything but not when I only list SCHEDULED. Then the console: in the UI-01 run I cancelled A9, looked it up again and it was still there as cancelled, and it showed up in the D1 list too. After that I booked A3 in the same slot and the final list had both of them.
 
 ## G. Ten formative answers
 
-1. What makes select_appointments pure, and what side effect breaks purity? <!-- response -->
-2. Which explicit inputs are needed, and why avoid a global store? <!-- response -->
-3. How can a new list reuse Appointment objects safely? <!-- response -->
-4. Why use a named key, and what breaks equal-time ties? <!-- response -->
-5. How do default and explicit status filters differ? <!-- response -->
-6. How do empty, unknown practitioner and invalid filter cases differ? <!-- response -->
-7. Which console errors recover, and how is unchanged state checked? <!-- response -->
-8. What is data integrity for registered participants, conflicts and history? <!-- response -->
-9. What is Copilot's review role, and who verifies findings? <!-- response -->
-10. How do pure functions and OOP responsibilities work together? <!-- response -->
+1. What makes select_appointments pure, and what side effect breaks purity?
+
+It only works with what you give it and hands back a new list. No printing, no input, no globals, and it doesn't change anything. If it did something like appointments.sort() on the list you passed in, or printed something, or changed an appointment's status, it wouldn't be pure anymore.
+
+2. Which explicit inputs are needed, and why avoid a global store?
+
+It needs the appointment list, the practitioner ID, and the status (or None). If it pulled from a global store, you could get different results without changing the inputs, which is confusing and annoying to test. Passing the list in means I can just make up a small list in my tests.
+
+3. How can a new list reuse Appointment objects safely?
+
+The list is brand new, so sorting it doesn't touch the original. But the appointments inside are the actual stored ones, so "is" checks still work and nothing gets copied. It's safe because the query only reads them and never changes them.
+
+4. Why use a named key, and what breaks equal-time ties?
+
+You can reuse it and test it by itself, and it's easier to read than a lambda. You pass it without brackets so sorted() can call it for each appointment. If two appointments are at the same time, the ID sorts them, so A1 comes before A2.
+
+5. How do default and explicit status filters differ?
+
+With no status you get everything for that practitioner, cancelled ones too. If you pick a status like SCHEDULED, you only get those. And if nothing matches you just get an empty list.
+
+6. How do empty, unknown practitioner and invalid filter cases differ?
+
+Empty is when the practitioner's real but has nothing that matches, so you get [] and that's totally fine. Unknown is when there's no one registered with that ID, so that's a LookupError. Invalid is when the ID's blank or the status isn't a real AppointmentStatus, which gives a ValueError.
+
+7. Which console errors recover, and how is unchanged state checked?
+
+Pretty much all of them. Wrong menu number, blank or unknown IDs, duplicate IDs, a bad date like 9:00 or 30 February, a made-up status, and cancelling something twice. Each one just shows an error and goes back to the menu. To check nothing changed, I did something after. For example, after trying to register P1 twice, finding P1 still gave Alex Example, and after the bad status, listing D1 still showed A1 as cancelled.
+
+8. What is data integrity for registered participants, conflicts and history?
+
+It's basically making sure the data stays right. Appointments can only use patients and practitioners that are actually registered, the same practitioner can't have two SCHEDULED appointments at the exact same time, and cancelled ones stay in the history as CANCELLED instead of disappearing.
+
+9. What is Copilot's review role, and who verifies findings?
+
+It's like having an extra reviewer point stuff out. It doesn't get the final say though. I check what it says against the real code, tests and requirements, then decide if I'm accepting, changing or rejecting it. My group checks it again in the PR review.
+
+10. How do pure functions and OOP responsibilities work together?
+
+The classes look after their own stuff. The domain has the rules, the store holds the data and the service ties it all together. The pure function just does the read-only filtering and sorting on whatever list the service hands it. So the objects deal with state and rules, and the pure function does the calculation, which makes both of them way easier to test.
 
 ## H. Review, completion and common handover
 
