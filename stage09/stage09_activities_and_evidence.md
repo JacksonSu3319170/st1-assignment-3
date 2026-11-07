@@ -74,12 +74,33 @@ Cover QRY-01–04, FP-01–03, UI-01–02 and relevant FR-01–09. Explain empty
 
 | Requirement / test ID | Code location | Case and meaningful assertion | Actual result | Evidence link |
 |---|---|---|---|---|
-| | | | | |
+| QRY-01 / test_practitioner_isolation | project/smartcare/queries.py select_appointments | One list with D1 and D2 appointments. D1 gives only A1, A2, A3 and D2 gives only B1, so D2 is the control | Passed | [e0a71cc test file](https://github.com/JacksonSu3319170/st1-assignment-3/blob/e0a71cc/project/tests/test_stage9_queries.py) |
+| QRY-02 / test_default_status_returns_all_statuses | queries.py select_appointments | No status given, and cancelled A2 is still in the result | Passed | Same file |
+| QRY-02 / test_each_status_filter (3 cases) | queries.py select_appointments | SCHEDULED gives A1, A3. CANCELLED gives A2. COMPLETED gives an empty list. Every returned appointment has the status asked for | 3 passed | Same file |
+| QRY-03 / test_equal_time_ties_break_by_id | queries.py appointment_sort_key | A1 and A2 are both at 2026-10-01 09:00, and A1 comes first because of its ID | Passed | Same file |
+| FP-03 / test_sort_key_returns_date_time_then_id | queries.py appointment_sort_key | The key for A1 is exactly (2026-10-01 09:00, 'A1') | Passed | Same file |
+| FP-03 / test_named_key_reuse_matches_query_order | queries.py appointment_sort_key | sorted() with the same named key gives the same order as the query | Passed | Same file |
+| FP-02 / test_source_order_and_fields_unchanged | queries.py select_appointments | The source IDs, dates and statuses are the same before and after, and result is not source | Passed | Same file |
+| FP-01 / test_repeated_calls_give_same_result_in_new_lists | queries.py select_appointments | Two calls with the same input give equal results, but in different list objects | Passed | Same file |
+| FP-02 / test_empty_source_returns_new_empty_list | queries.py select_appointments | An empty list in gives a new empty list out | Passed | Same file |
+| FP-02 / test_already_sorted_source_returns_new_list | queries.py select_appointments | An already sorted list gives an equal list back, but not the same list object | Passed | Same file |
+| FP-02 / test_result_holds_actual_stored_objects | queries.py select_appointments | result[0] is a1 and result[2] is a3, so the new list holds the real objects | Passed | Same file |
+| FP-01 / test_query_prints_nothing | queries.py select_appointments | Captured output is empty after calling the query | Passed | Same file |
+| QRY-04 / test_known_practitioner_with_no_matches_returns_empty | project/smartcare/services.py list_practitioner_appointments | D2 is registered but has no appointments, so it returns [] | Passed | Same file |
+| QRY-04 / test_unknown_practitioner_raises_lookup_error | services.py list_practitioner_appointments | D99 raises LookupError | Passed | Same file |
+| QRY-04 / test_blank_practitioner_raises_value_error (2 cases) | services.py list_practitioner_appointments | '' and '   ' both raise ValueError | 2 passed | Same file |
+| QRY-04 / test_invalid_status_rejected_and_state_unchanged | services.py list_practitioner_appointments | The string 'scheduled' raises ValueError, the stored IDs and statuses stay the same, and a normal listing still works after | Passed | Same file |
+| QRY-04 / test_padded_practitioner_id_uses_registered_id | services.py list_practitioner_appointments | ' D1 ' with spaces still finds A1 | Passed | Same file |
+| FR-07 / test_cancelled_history_retained_and_listed | services.py list_practitioner_appointments | After cancelling, A1 is found (same object, CANCELLED), shows up with no filter, and doesn't show up under SCHEDULED | Passed | Same file |
+| FR-05, FR-07 / test_cancelled_slot_is_freed_and_both_listed_in_order | services.py list_practitioner_appointments | After cancelling A1, A3 books the same slot. No filter gives [A1, A3] and SCHEDULED gives [A3] | Passed | Same file |
+
+Commands from project/: python -m pytest -q tests/test_stage9_queries.py gave 22 passed in 0.12s, and python -m pytest -q gave 68 passed in 0.26s (the 46 earlier tests plus the 22 new ones). Commit e0a71cc.
 
 Include practitioner isolation, every enum status/default all, equal-time ID tie-break, named-key reuse, repeated calls, empty/already-sorted fresh lists, unchanged source order/fields, known-empty/unknown/invalid service cases and retained history.
 
-Purity explanation from code inspection, including absence of hidden state and I/O: <!-- response -->
-What the tests do and do not establish: <!-- response -->
+Purity explanation from code inspection, including absence of hidden state and I/O: select_appointments only uses the three things passed into it. It doesn't use any global variables or the data store, and it has no print() or input(). It builds its own new list called selected, adds matching appointments to it, and returns sorted(selected, ...), which is also a new list. It never calls .sort() on the list it was given and never changes any appointment. appointment_sort_key just returns a tuple and doesn't change anything. So the same input always gives the same output, with no side effects.
+
+What the tests do and do not establish: The tests show the filtering, ordering, new-list behaviour and service errors all work for the cases I picked, and that all 46 earlier tests still pass. They don't prove it works for every possible input. COMPLETED is only tested as returning an empty list, because there's no way to make a completed appointment in the project yet. The no-output test only checks print, so the "no input" part comes from reading the code. The tests also don't cover the console, which is shown separately in section D.
 
 ## D. Integrated console and workflow evidence
 
