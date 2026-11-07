@@ -179,12 +179,12 @@ The classes look after their own stuff. The domain has the rules, the store hold
 
 ## H. Review, completion and common handover
 
-Issues and bounded branches: <!-- links -->
-PR/diff and another-member human reviewer: <!-- actual links/name -->
+Issues and bounded branches: Stage 9 queries, service listing, console menu and tests were all owned by Ayaz on one branch, feature/stage9-queries, started from Stage 8 main (6895869).
+PR/diff and another-member human reviewer: https://github.com/JacksonSu3319170/st1-assignment-3/pull/11. Review requested from Jackson (JacksonSu3319170) and Jonathan (jonathansv7).
 Review responses and Copilot comparison: <!-- links -->
 Integrated common Stage 9 SHA: <!-- complete -->
 Full regression command, working directory, actual count/result and evidence: <!-- complete -->
-README run instructions and scope/limitations: <!-- link -->
+README run instructions and scope/limitations: Added a Stage 9 section to project/README.md with how to run the tests and the menu, what each option does, and the limitations (session-only data, no rescheduling, no saving). Commit 7bbd4dd.
 Unresolved issues and support/action: <!-- complete -->
 UG common candidate / PG future branch plan: <!-- complete -->
 
