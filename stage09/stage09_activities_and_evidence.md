@@ -4,7 +4,7 @@ Common UG and PG record. All Assignment 3 stage materials are provided from the 
 
 Group: Wed 4:30 - 6:30 Group 5
 Members and responsibilities: Jonathan (jonathansv7), Jackson (JacksonSu3319170), Ayaz (AyazMohammed999), all UG. Ayaz owns Stage 9.
-Stage 8 integrated SHA, command, working directory and actual result: <!-- complete -->
+Stage 8 integrated SHA, command, working directory and actual result: 68958695e23da07eb218554cc9c29237734fe0e5, python -m pytest -q from project/, 46 passed in 0.19s.
 
 ## A. Tutorial activities
 
