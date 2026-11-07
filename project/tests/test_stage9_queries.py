@@ -112,13 +112,17 @@ def test_named_key_reuse_matches_query_order():
 
 
 def test_source_order_and_fields_unchanged():
-    """FP-02: the source list and appointment fields are not changed."""
+    """FP-02: the source list and every appointment field are not changed."""
     source, *_ = make_source()
     before = [
-        (a.appointment_id, a.date_time, a.status) for a in source
+        (a.appointment_id, a.patient, a.practitioner, a.date_time, a.status)
+        for a in source
     ]
     result = select_appointments(source, 'D1')
-    after = [(a.appointment_id, a.date_time, a.status) for a in source]
+    after = [
+        (a.appointment_id, a.patient, a.practitioner, a.date_time, a.status)
+        for a in source
+    ]
     assert after == before
     assert result is not source
 
