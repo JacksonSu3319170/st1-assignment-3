@@ -116,15 +116,16 @@ Note: Both demos were run by hand and the output was saved straight from the ter
 
 ## E. GitHub Copilot review and human decisions
 
-Human design completed before AI: <!-- reference -->
-Actual prompt/context supplied: <!-- paste or accessible reference -->
-Actual response: <!-- accessible reference -->
+Human design completed before AI: Section B (human design and contracts) was written and committed before I used Copilot, in commit bba449d "Add Stage 9 tutorial and human design before Copilot".
+Actual prompt/context supplied: Ayaz used GitHub Copilot Chat on github.com in a new chat. This time I attached our group repo (JacksonSu3319170/st1-assignment-3, branch feature/stage9-queries) first, because in Stage 8 Copilot looked at my old Assignment 2 repo by mistake. The prompt listed the four files to review (queries.py, services.py, console.py, test_stage9_queries.py), the QRY-01–04, FP-01–03, FR-07 and UI-01/UI-02 requirements, my human design decisions from B, and the current result (68 passed). It asked for up to 5 ranked findings with file, requirement, severity and a check, and told it not to rewrite the code or invent new requirements. Chat: https://github.com/copilot/c/c847803a-1d6a-4a65-9e03-318e9d84a637
+Actual response: Same chat link. Copilot said it found no clear implementation defect, and gave two findings, both about test coverage.
 
 | AI finding | Code/test evidence | Severity | Accept/Modify/Reject and reason | Change or no change | Actual verification |
 |---|---|---|---|---|---|
-| | | | | | |
+| UI-01/UI-02 have no automated test, so 68 passed doesn't prove the console works (console.py run_menu) | That's true, none of the test files test the console. But I already showed UI-01 and UI-02 with two real console runs, saved in ui01_demo_output.txt and ui02_demo_output.txt (see D) | Medium (Copilot's rating) | Modify. Copilot is right that pytest doesn't cover the menu, so I don't claim the 68 passing tests prove UI-01/UI-02. But I didn't add a scripted test for every menu option, because my plan in B already used console demos as the UI evidence, and that big test would be more than Stage 9 asks for. I kept the demos as the evidence and noted this gap in C | No code change | Both console demos (D) show every command working and every bad input giving an error and going back to the menu with the data unchanged |
+| test_source_order_and_fields_unchanged only checks ID, time and status, not the patient and practitioner | Correct, the test only snapshotted those three things. Reading select_appointments, it only filters, appends and sorts, so there's no actual bug, just a weaker test | Low | Accept. It's a small fix that makes the test check every field, so it was worth doing | Added patient and practitioner to the before and after snapshots in the test, commit 2a443f5 | python -m pytest -q from project/ gave 68 passed in 0.24s |
 
-Responsibility check: explain how domain invariants, shared-store collections, service coordination, pure queries and console effects remain separate: <!-- response -->
+Responsibility check: Each part still does its own job. The domain objects handle their own rules, like Appointment.cancel() changing the status. The data store owns the three collections and just adds, finds and lists, with no printing. The service coordinates: it checks the practitioner exists and the status is a real AppointmentStatus, then gets the list from the store and passes it to the query. The query is pure and only filters and sorts the list it's given. The console is the only part that reads input, prints and turns typed text into enums and dates. Copilot didn't find anything that breaks these boundaries.
 
 ## F. Required reflections
 
