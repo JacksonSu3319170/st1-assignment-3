@@ -1,3 +1,132 @@
+(.venv) PS C:\Users\ASUS\PycharmProjects\st1-assignment-3\project> python main.py --interactive
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 1
+Patient ID: P1
+Patient name: Alex Example
+Registered patient P1: Alex Example
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 3
+Practitioner ID: D1
+Practitioner name: Sam Example
+Specialty: General
+Registered practitioner D1: Sam Example (General)
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 3
+Practitioner ID: D2
+Practitioner name: Morgan Example
+Specialty: General
+Registered practitioner D2: Morgan Example (General)
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 2
+Patient ID: P1
+P1: Alex Example
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 4
+Practitioner ID: D1
+D1: Sam Example (General)
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 4
+Practitioner ID: D2
+D2: Morgan Example (General)
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 5
+Appointment ID: A1
+Patient ID: P1
+Practitioner ID: D1
+Date/time (YYYY-MM-DD HH:MM): 2026-10-01 9:00
+Error: Use date/time format YYYY-MM-DD HH:MM
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
+4. Find practitioner
+5. Book appointment
+6. Cancel appointment
+7. Find appointment
+8. List practitioner appointments
+0. Exit
+Choose an option: 5
+Appointment ID: A9
+Patient ID: P1
+Practitioner ID: D1
+Date/time (YYYY-MM-DD HH:MM): 2026-10-01 9:00
+Error: Use date/time format YYYY-MM-DD HH:MM
+
+SmartCare menu
+1. Register patient
+2. Find patient
+3. Register practitioner
 4. Find practitioner
 5. Book appointment
 6. Cancel appointment
