@@ -6,7 +6,7 @@ All Assignment 3 stage materials are provided from the beginning. Complete this 
 
 Group/tutorial: Wed 4:30 - 6:30 Group 5
 Members and UG/PG cohorts: Jonathan (jonathansv7), Jackson (JacksonSu3319170), Ayaz (AyazMohammed999), all UG
-Record owner / contribution links for each member: Ayaz (AyazMohammed999) – Stage 8 owner. Contribution links will be added after the PR is merged.
+Record owner / contribution links for each member: Ayaz (AyazMohammed999) – Stage 8 owner. PR: https://github.com/JacksonSu3319170/st1-assignment-3/pull/10
 
 Use concise results and accessible artefact links rather than copying entire logs. Keep human-first entries before consulting GitHub Copilot. Link shared evidence once; do not repeat it across sections. No entries below are specimen answers or claimed results.
 
@@ -187,14 +187,14 @@ Result — accepted, revised or rejected / reason / behaviour-preservation concl
 
 ## I. Git, human review and integration
 
-Issues for both defects / refactor scope and owners: [complete]
-Branch / prepared, repair and refactor checkpoints: [link B/C/D/H]
-PR link and another member's reviewer identity: [complete]
-Key human feedback, difference from Copilot findings and response/outcome: [complete]
-Actual review approval / merge evidence: [complete]
-Integrated code SHA and team pull/retest command / working directory / result: [complete]
-Evidence-only later SHA / explanation if different: [complete or not applicable]
-Each member's substantive contribution and artefact: [complete]
+Issues for both defects / refactor scope and owners: F8-01 (cancelled appointment lookup), F8-02 (practitioner conflict check) and the magic-string refactor were all owned by Ayaz and tracked together in PR #10 on debug/stage08.
+Branch / prepared, repair and refactor checkpoints: Branch debug/stage08. Prepared 029e78b (B), regression tests bc543d3 (G), F8-01 repair f2e6e19 (C), F8-02 repair 946dfe1 (D), refactor 8e9298d (H).
+PR link and another member's reviewer identity: https://github.com/JacksonSu3319170/st1-assignment-3/pull/10. Reviewed by Jonathan (jonathansv7) and Jackson (JacksonSu3319170).
+Key human feedback, difference from Copilot findings and response/outcome: Both Jonathan and Jackson approved the PR without asking for any changes, so nothing needed fixing. The big difference from Copilot was that they reviewed our actual repo and diff, while Copilot kept looking at the wrong repository.
+Actual review approval / merge evidence: PR #10 was approved by jonathansv7 and JacksonSu3319170, then merged into main by Jackson as commit 6895869.
+Integrated code SHA and team pull/retest command / working directory / result: 68958695e23da07eb218554cc9c29237734fe0e5. I pulled main with git pull --ff-only, then ran python -m pytest -q from project/ and got 46 passed in 0.19s.
+Evidence-only later SHA / explanation if different: These last record updates (Sections I and L) were added afterwards on feature/stage9-queries and will reach main with the Stage 9 PR. They only change this record, not any code, so the tested code SHA stays 6895869.
+Each member's substantive contribution and artefact: Ayaz did the Stage 8 diagnosis, regression tests, both repairs, the refactor, the Copilot review and this record (PR #10 commits). Jonathan reviewed and approved PR #10. Jackson added Pranav as a temporary collaborator for the preparation, then reviewed, approved and merged PR #10.
 
 ## J. Required reflections
 
@@ -268,18 +268,18 @@ Diagnose before you fix. Work out what's really going on first by getting the bu
 
 ## L. Completion and handover
 
-- [ ] Existing project, earlier tests and stage records preserved.
-- [ ] Passing Stage 7 SHA and safe preparation details recorded.
-- [ ] Both defects reproduced with meaningful failing tests.
-- [ ] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
-- [ ] Supported causes and minimal repairs explained; focused and full regression results recorded.
-- [ ] One genuine refactor verified under passing before/after tests.
-- [ ] Human PR review, feedback resolution and integrated retest recorded.
-- [ ] Tutorial, three reflections and ten formative responses complete.
-- [ ] Local recovery metadata excluded from submitted source.
-- [ ] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
+- [x] Existing project, earlier tests and stage records preserved.
+- [x] Passing Stage 7 SHA and safe preparation details recorded.
+- [x] Both defects reproduced with meaningful failing tests.
+- [x] Both human hypotheses recorded before Copilot; actual suggestions evaluated with evidence.
+- [x] Supported causes and minimal repairs explained; focused and full regression results recorded.
+- [x] One genuine refactor verified under passing before/after tests.
+- [x] Human PR review, feedback resolution and integrated retest recorded.
+- [x] Tutorial, three reflections and ten formative responses complete.
+- [x] Local recovery metadata excluded from submitted source.
+- [x] Same project and full suite ready for Stage 9 after Stage 8 integration, verification and recording.
 
 Verified integrated code SHA / result: see I.
-Submitted SHA and evidence-only difference if any: [complete]
-Unresolved issues or incomplete checks / owner / next action: [complete]
-Handover note: [complete]
+Submitted SHA and evidence-only difference if any: The tested code SHA is 6895869 (46 passed). The final record updates in I and L come after it and only change this file.
+Unresolved issues or incomplete checks / owner / next action: None.
+Handover note: Stage 8 is merged into main at 6895869 with all 46 tests passing. Stage 9 carries on from there on feature/stage9-queries.
