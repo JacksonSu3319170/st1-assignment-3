@@ -181,20 +181,19 @@ The classes look after their own stuff. The domain has the rules, the store hold
 
 Issues and bounded branches: Stage 9 queries, service listing, console menu and tests were all owned by Ayaz on one branch, feature/stage9-queries, started from Stage 8 main (6895869).
 PR/diff and another-member human reviewer: https://github.com/JacksonSu3319170/st1-assignment-3/pull/11. Review requested from Jackson (JacksonSu3319170) and Jonathan (jonathansv7).
-Review responses and Copilot comparison: <!-- links -->
-Integrated common Stage 9 SHA: <!-- complete -->
-Full regression command, working directory, actual count/result and evidence: <!-- complete -->
-README run instructions and scope/limitations: Added a Stage 9 section to project/README.md with how to run the tests and the menu, what each option does, and the limitations (session-only data, no rescheduling, no saving). Commit 7bbd4dd.
-Unresolved issues and support/action: <!-- complete -->
-UG common candidate / PG future branch plan: <!-- complete -->
+Review responses and Copilot comparison: Both Jackson (JacksonSu3319170) and Jonathan (jonathansv7) approved PR #11 without asking for changes. Jackson commented "Everything looks great! Also meets Stage 9 requirements, amazing job." Copilot's review (Section E) only raised test-coverage points, while the human reviewers checked the actual diff against the Stage 9 requirements and didn't find any problems.
+Integrated common Stage 9 SHA: 80d59fa9a60c03d3922c706733ff525762522661 (PR #11, merged into main by Jonathan).
+Full regression command, working directory, actual count/result and evidence: I pulled main with git pull --ff-only, then ran python -m pytest -q from project/ and got 69 passed in 0.29s.
+Unresolved issues and support/action: None blocking. The known limits are already noted in C and E. COMPLETED can only be tested as an empty result because nothing can mark an appointment completed yet, and the console is checked by the saved demos rather than pytest. This final record update is record-only (branch docs/stage09-final), so the tested code SHA stays 80d59fa.
+UG common candidate / PG future branch plan: We're all UG, so 80d59fa on main is the common candidate for Stage 12. There's no PG Stage 10/11 work.
 
-- [ ] Query contracts, purity, new lists and named-key ordering verified.
-- [ ] Service empty/unknown/invalid cases and cancellation history verified.
-- [ ] Every console command and invalid-input recovery demonstrated.
-- [ ] Query and workflow tests plus all previous tests pass; actual evidence linked.
-- [ ] Human design, Copilot critique, review and integration recorded honestly.
-- [ ] Reflections and ten formative responses completed.
-- [ ] README updated; earlier code/tests/records preserved.
-- [ ] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
+- [x] Query contracts, purity, new lists and named-key ordering verified.
+- [x] Service empty/unknown/invalid cases and cancellation history verified.
+- [x] Every console command and invalid-input recovery demonstrated.
+- [x] Query and workflow tests plus all previous tests pass; actual evidence linked.
+- [x] Human design, Copilot critique, review and integration recorded honestly.
+- [x] Reflections and ten formative responses completed.
+- [x] README updated; earlier code/tests/records preserved.
+- [x] Common SHA protected for UG Stage 12; PG Stage 10/11 work deferred until approved.
 
 No persistence, rescheduling or assurance implementation is part of Stage 9. UG: 6→7→8→9→12. PG: 6→7→8→9→10→11→12. Mixed groups keep one repository and protect the common candidate.
