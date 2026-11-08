@@ -2,41 +2,45 @@
 
 BLANK student response template. Supplied from the beginning in stage12/ in your EXISTING repository; complete it only when you reach Stage 12 after the previous applicable stage is integrated, verified and recorded; preserve project/, tests, earlier records and Git history. UG/common and PG/extended scope must be explicit. Use concise results and versioned links, not copied logs or source. No staff answers or fabricated approvals.
 
-Group/tutorial: [response]
-Members and UG/PG applicability: [response]
+Group/tutorial:
+Group 5
+Wednesday 4:30 - 6:30
 
+Members and UG/PG applicability: 
+Jackson S (u3319170) UG
+Jonathan V (u3319279) UG
+Ayaz M (u3320654) UG
 
 ## A Release scope and starting SHA
 
-Release label/version and requirements baseline: [response]
-Common starting SHA / branch / applicable members: [response]
-PG starting SHA / branch / applicable members or not applicable: [response]
-Working-state review and approved integration: [response]
-Protected common candidate and PG differences: [response]
-Feature freeze / owner / verifier: [response]
+Release label/version and requirements baseline: v1.0-UG (Overview Rev 2: Common UG scope, FR-01–FR-09, QRY-01–04, FP-01–03, in-memory storage only)
+Common starting SHA / branch / applicable members: c5a6dbd1b0e24482bbab9923560bff11b9ac7f0a / main / Jackson, Ayaz, Jonathan
+PG starting SHA / branch / applicable members or not applicable:
+Working-state review and approved integration: Clean status verified with zero untracked runtime artifacts. Stage 9 pure query functions (select_appointments, appointment_sort_key), practitioner listing, and interactive console menu were reviewed, approved via pull request, and integrated into the primary branch with full test suite passing.
+Protected common candidate and PG differences: Single common candidate at SHA c5a6dbd1b0e24482bbab9923560bff11b9ac7f0a. No PG extension differences or secondary branches required.
+Feature freeze / owner / verifier: Strict feature freeze executed, no optional or new feature development permitted. Owner: Jackson / Verifier: Jonathan
 
 
 ## B Requirements and release readiness matrix
 
-Tutorial activity 1: All tests pass, README setup is incomplete, one dependency is unreviewed and a known limitation is undocumented. Decide Release / Release with conditions / Do not release and justify: [response]
+Tutorial activity 1: All tests pass, README setup is incomplete, one dependency is unreviewed and a known limitation is undocumented. Decide Release / Release with conditions / Do not release and justify: Do not release (or Release with some exceptions), Passing tests show the code works, but that alone does not mean the software is ready to release. Without clear setup instructions in the README, others cannot run the project on a clean computer. An unreviewed dependency could introduce security, licensing, or stability issues, and missing documentation hides known limitations from reviewers. Before signing off, the team needs to test the setup steps on a fresh machine, audit the dependency, and clearly document all known limitations in the release files.
 
 Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptance IDs, evidence and reviewer; distinguish common/PG applicability.
 
-| Release claim / requirement / scope | Evidence | Location/link and SHA | Reviewer | Sufficient? | Gap/action |
-|---|---|---|---|---|---|
-| Cancellation history works | [response] | [response] | [response] | [response] | [response] |
-| Architecture responsibilities are appropriate | [response] | [response] | [response] | [response] | [response] |
-| Rescheduling is safe — PG only | [response] | [response] | [response] | [response] | [response] |
-| AI use is responsible — common recheck / PG assurance | [response] | [response] | [response] | [response] | [response] |
-| System is maintainable | [response] | [response] | [response] | [response] | [response] |
-| FR-01–03 register/find and validation | [response] | [response] | [response] | [response] | [response] |
-| FR-04–05 booking/conflict rules | [response] | [response] | [response] | [response] | [response] |
-| FR-06–08 cancellation/history/find | [response] | [response] | [response] | [response] | [response] |
-| FR-09 and QRY/FP listing/filter/order/purity | [response] | [response] | [response] | [response] | [response] |
-| UI full console sequence and error recovery | [response] | [response] | [response] | [response] | [response] |
-| Session-only scope / FR-10 retired | [response] | [response] | [response] | [response] | [response] |
-| PG RES and assurance integration | [response] | [response] | [response] | [response] | [response] |
-
+| Release claim / requirement / scope                   | Evidence                                                                                                                                | Location/link and SHA                                                      | Reviewer     | Sufficient? | Gap/action                                    |
+|-------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|--------------|-------------|-----------------------------------------------|
+| Cancellation history works                            | Tests verify cancelled appointments keep their ID, set status to CANCELLED, remain findable, and block double cancellation.             | tests/test_appointment*.py (SHA: 71bd3e69bc7db6629b6efbc99080896e6ce46f01) | [Teammate 1] | Yes         | None; verified in test suite                  |
+| Architecture responsibilities are appropriate         | Entities manage invariants, SmartCareDataStore holds in-memory data, services coordinate tasks, queries stay pure, and console runs UI. | project/ (SHA: [Insert SHA])                                               | [Teammate 2] | Yes         | None; clean separation confirmed              |
+| Rescheduling is safe — PG only                        | Not applicable for Undergraduate pathway (Common UG scope only).                                                                        | N/A — UG Scope                                                             | N/A          | Yes         | None; retained template as-is for UG          |
+| AI use is responsible — common recheck / PG assurance | Copilot suggestions were human-reviewed, tested, free of secrets/keys, and tested with synthetic data only.                             | Section E/N (SHA: [Insert SHA])                                            | [Teammate 1] | Yes         | None; verified during code audit              |
+| System is maintainable                                | Clean PEP 8 styling, type hints, docstrings, focused methods, and zero dead code.                                                       | project/ (SHA: [Insert SHA])                                               | [Teammate 2] | Yes         | None; code review complete                    |
+| FR-01–03 register/find and validation                 | Tests and console show registration, input validation, and clean recovery on invalid searches.                                          | tests/test_patient*.py, tests/test_practitioner*.py (SHA: [Insert SHA])    | [Teammate 1] | Yes         | None; passing                                 |
+| FR-04–05 booking/conflict rules                       | Tests verify valid bookings, reject practitioner double-booking, allow different practitioners at same time, and ensure atomic failure. | tests/test_booking*.py (SHA: [Insert SHA])                                 | [Teammate 2] | Yes         | None; all conflict rules pass                 |
+| FR-06–08 cancellation/history/find                    | Tests and demo verify successful cancellation, history lookup by ID, and error handling on bad cancellations.                           | tests/test_appointment*.py (SHA: [Insert SHA])                             | [Teammate 1] | Yes         | None; verified                                |
+| FR-09 and QRY/FP listing/filter/order/purity          | Pure functions (select_appointments, appointment_sort_key) provide ascending order and status filters without altering data.            | project/queries/, tests/test_queries*.py (SHA: [Insert SHA])               | [Teammate 2] | Yes         | None; Stage 9 integrated and tested           |
+| UI full console sequence and error recovery           | Interactive menu handles full user workflow, bad dates, and invalid choices without crashing, cleanly returning to menu.                | project/main.py (SHA: [Insert SHA])                                        | [Teammate 1] | Yes         | None; interactive demo verified               |
+| Session-only scope / FR-10 retired                    | In-memory storage with synthetic data only; no database or external files; FR-10 retired.                                               | project/ (SHA: [Insert SHA])                                               | [Teammate 2] | Yes         | None; session data loss on exit is documented |
+| PG RES and assurance integration                      | Not applicable to UG cohort.                                                                                                            | N/A — UG Scope                                                             | N/A          | Yes         | None                                          |
 
 ## C Full regression results
 
@@ -199,25 +203,25 @@ Remaining administration or release dependency: [response]
 
 ## M Formative questions
 
-1. What is a release candidate? [response]
+1. What is a release candidate? A release candidate (RC) is a nearly finished version of the software that has all features built and is considered stable. It is treated as the final product unless testing reveals a major, game-breaking bug.
 
-2. What is feature freeze and why is it used? [response]
+2. What is feature freeze and why is it used? A feature freeze is the point in development where the team stops adding new features. It is used to lock down the scope so the team can focus entirely on fixing bugs, testing, and writing documentation without creating new issues.
 
-3. What is regression testing in a release context? [response]
+3. What is regression testing in a release context? Regression testing means re-running your full test suite against the latest build. Its purpose is to prove that recent code changes, refactors, or bug fixes haven't accidentally broken existing features.
 
-4. What is a known limitation? [response]
+4. What is a known limitation? A known limitation is an acknowledged boundary or missing capability that the team deliberately chose not to support (such as data only saving in-memory for the current session). It is documented openly so users and evaluators know what the system cannot do.
 
-5. What is technical debt? [response]
+5. What is technical debt? Technical debt is the future rework you create when you take a shortcut or choose a quick fix today instead of the best long-term solution. It represents compromises you intentionally accept to hit a deadline, knowing you will need to clean them up later.
 
-6. What are release notes? [response]
+6. What are release notes? Release notes are a brief document that comes with a software version. They tell users and reviewers what was built, what bugs were fixed, any architectural changes made, and what limitations still exist.
 
-7. What is software maintenance? [response]
+7. What is software maintenance? Software maintenance is the ongoing work that starts right after a release is deployed. It covers fixing newly found bugs, updating libraries, improving performance, and adapting the program as requirements change over time.
 
-8. What is the purpose of the individual demonstration/viva? [response]
+8. What is the purpose of the individual demonstration/viva? The purpose of the individual viva is to prove personal understanding and genuine contribution. It confirms that you understand the architecture, can explain why design decisions were made, can walk through tests, and can speak to the code you actually worked on.
 
-9. What should the final responsible-AI check establish before release? [response]
+9. What should the final responsible-AI check establish before release? The final check confirms that all AI-generated code was human-reviewed and tested, without introducing exposed secrets, unapproved dependencies, or real patient data.
 
-10. What is the main course conclusion about AI and the role of the software engineer? [response]
+10. What is the main course conclusion about AI and the role of the software engineer? While AI is great at drafting code and speeding up repetitive tasks, software engineers are still essential for critical thinking, architecture, and accountability. AI cannot take responsibility for system design, verify overall correctness, navigate ethical choices, or guarantee the safety of humans and their decisions.
 
 
 ## N Reflection viva and handover
