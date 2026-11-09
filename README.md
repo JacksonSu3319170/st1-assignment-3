@@ -1,17 +1,19 @@
 # Software Technology 1 Assignment 3
 
 One group repository and one evolving SmartCare application.
-Baseline: Stage 6 foundation, 2026 revision 2. This starter deliberately leaves the three Stage 6 service tasks incomplete.
+
+Requirements baseline: SmartCare Assignment 3, 2026 revision 2. This repository contains the SmartCare application developed through Stages 6–9, including patient and practitioner lookup, appointment cancellation, regression testing, defect corrections, appointment queries and an interactive console. Stage 12 release completed too.
 
 ## Group index
 
-- Group and tutorial: [complete]
-- Member names, GitHub usernames and UG/PG cohorts: [complete]
-- Shared repository URL: [complete]
-- Latest completed stage: [complete]
-- Verified code SHA: [complete]
-- Test command, working directory and observed result: [complete]
-- Final submitted SHA, if different from tested code SHA: [complete; explain evidence-only changes]
+- Group and tutorial: Group 5, Wednesday 4:30–6:30
+- Member names and cohorts: Jackson S (UG), Jonathan V (UG), Ayaz M (UG)
+- Shared repository URL: https://github.com/JacksonSu3319170/st1-assignment-3
+- Latest completed stage: Stage 9; Stage 12 release verification in progress
+- Planned release label: `v1.0-UG`
+- Verified code SHA: `d960ba35b69dc469cf68100c311a19195064e70f`
+- Test command, working directory and observed result: From `project/`, `python -m pytest` — 69 passed, 0 failed, Python 3.14.7, pytest 8.3.5, macOS
+- Final submitted SHA: Pending final Stage 12 evidence commit and source ZIP verification
 
 Do not put student IDs, private peer ratings, credentials or personal contact details here.
 
@@ -44,13 +46,25 @@ Complete the supplied Stage 12 record when you reach Stage 12. UG releases the c
 - [Stage 11 PG activities and evidence](stage11_pg/stage11_activities_and_evidence.md)
 - [Stage 12 activities and evidence](stage12/stage12_activities_and_evidence.md)
 
-Git commands in the practical guide run from this root. Application commands run from project/:
+Git commands in the practical guide run from the repository root. Application commands run from `project/`:
 
 ```sh
 cd project
+python -m pip install -r requirements-dev.txt
 python main.py
+python main.py --interactive
 python -m pytest
 cd ..
 ```
 
-Use the approved environment described in the Git/GitHub group guide. The verified baseline is Python 3.13 with pytest 8.3.5. GitHub Copilot is the nominated assistant; verify significant output and record required decisions. Use synthetic data only. Use each supplied record only when you reach that stage in the applicable sequence.
+The documented teaching baseline is Python 3.13 with pytest 8.3.5. The integrated UG release candidate was also verified on macOS using Python 3.14.7 and pytest 8.3.5, with all 69 automated tests passing.
+
+The application uses in-memory, session-only storage. Records are lost when the application exits. Persistent databases, production authentication, clinical decision-making and PG-only rescheduling are outside the UG scope.
+
+GitHub Copilot is the nominated AI assistant. Significant AI-assisted contributions require human review, verification and documented decisions. Only synthetic data must be used.
+
+**Planned release:** `v1.0-UG`
+
+**Verified code SHA:** `d960ba35b69dc469cf68100c311a19195064e70f`
+
+**Release status:** Final Package and Verification Approved.
