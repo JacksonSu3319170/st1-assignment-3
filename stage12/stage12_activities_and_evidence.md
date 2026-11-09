@@ -216,14 +216,15 @@ Tutorial activity 2 and actual readiness matrix. Add exact requirement/acceptanc
 
 **Exact PG tested SHA or not applicable:** Not applicable — UG-only group.
 
-**Final submitted SHA / repository URL:** SmartCare `v1.0-UG`, repository: https://github.com/JacksonSu3319170/st1-assignment-3. The integrated executable release was verified at `d960ba35b69dc469cf68100c311a19195064e70f`. The final documentation commit SHA is to be recorded from Git after the Stage 12 evidence is committed.
+**Final submitted SHA / repository URL:** SmartCare `v1.0-UG`, repository: https://github.com/JacksonSu3319170/st1-assignment-3. The integrated executable release was verified at `d960ba35b69dc469cf68100c311a19195064e70f`. The final documentation commit SHA is 03e1c93eba35ff53a3554a721beb90da3d952819.
 
 **Evidence-only later commit and difference explanation:** The final Stage 12 documentation update includes the release evidence, README improvements, release notes and handover information. These documentation changes do not alter the tested executable behaviour. The final Git diff is used to confirm the distinction between the tested executable candidate and the later documentation-only submission commit.
 
 **Executable changes after testing and re-verification:** No executable changes are intended after the 69/69 passing release regression. Any executable modification would require focused and full re-verification before submission.
 
-**Source ZIP name / SHA correspondence / extracted comparison:** The source ZIP is prepared from the final submitted Git commit and checked against its recorded SHA. It includes the root README, `.gitignore`, project source, tests and applicable stage evidence, excluding Git metadata, environments, caches and private material. The exact ZIP filename and extracted comparison result are recorded during final packaging.
+**Source ZIP name / SHA correspondence / extracted comparison:** `SmartCare-v1.0-UG-source-clean.zip` was generated from final tested commit `03e1c93eba35ff53a3554a721beb90da3d952819` using `git archive`. Archive inspection confirmed 38 entries, including root `README.md`, `.gitignore`, project source, all eight test files and applicable stage records. Git metadata, PyCharm configuration, virtual environments and test caches were excluded. The ZIP was extracted into a separate `smartcare-zip-verification/` directory, and `python -m pytest` passed all 69 tests in 0.05 seconds using Python 3.14.7 and pytest 8.3.5. The extracted source was verified successfully; the existing Python environment was reused.
 
+The earlier executable release candidate d960ba35b69dc469cf68100c311a19195064e70f was followed by a reviewed documentation-only merge. The final merged commit was re-tested successfully with 69/69 tests passing.
 ## L Submission package verification
 
 - [x] Feature freeze and scoped requirements traced.
